@@ -1,0 +1,33 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    <h1>List of movies</h1>
+     <div class="row">
+        {% if request.user.is_authenticated %}
+        <div class="col-md-3">
+                <div class="card-body">
+                    <a href="{% url 'movies:movie_add' %}">Add new movie</a>
+                </div>
+        </div>
+        {% endif %}
+        {% for movie in movies %}
+            <div class="col-md-3">
+                <a href="{% url 'movies:movie_details' id=movie.id %}">
+                <img src="https://i.ytimg.com/vi/z9qOOfVipdw/hqdefault.jpg" class="card-img-top" alt="...">
+                <div class="card-body">
+                    <h3>{{ movie.name }}</h3>
+                    <p>Directed by: {{ movie.director }},
+                        released in: {{ movie.year }}
+                        {% if movie.is_adult %},  PG: 18 {% endif %}</p>
+                    <p class="card-text">
+                        {% for genre in movie.genres %}
+                            <span class="badge bg-info text-dark">{{ genre }}</span>
+                        {% endfor %}
+                    </p>
+                </div>
+                </a>
+            </div>
+        {% endfor %}
+        </div>
+    </div>
+{% endblock %}
