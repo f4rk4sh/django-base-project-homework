@@ -1,10 +1,10 @@
 from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render
-import datetime
 from time import sleep
 import logging
 from django.urls import reverse_lazy
 from apps.movies.models import Movie, Person, PersonMovie
+from .forms import MovieForm, PersonForm
 
 logger = logging.getLogger(__name__)
 
@@ -18,37 +18,56 @@ def movie_details(request, **kwargs):
 
 
 def movie_add(request):
-    name = ''
-    year = ''
-    error = ''
-    director = ''
-
     if request.method == 'POST':
-        name = request.POST.get('name')
-        year = request.POST.get('year')
-        director = request.POST.get('director')
+        form = MovieForm(request.POST)
 
-        if not name:
-            error = 'Name was not entered'
+        if form.is_valid():
+            movie = Movie.objects.create(name=form.data['name'],
+                                         title_type=form.data['title_type'],
+                                         is_adult=form.data.get('is_adult') == 'on',
+                                         year=form.data['year'],
+                                         genres=list(form.data['genres'].split(',')))
 
-        if not year:
-            error = 'Year was not entered'
-        try:
-            year_date = datetime.date(year=int(year), month=1, day=1)
-        except ValueError:
-            error = 'Incorrect year'
+            #  added 'uam'(user add movie) to demarcate imdb data and user input data
+            movie.imdb_id = 'uam' + str(movie.id)
+            movie.save()
 
-        if not error:
-            movie = Movie.objects.create(name=name, year=year_date)
-            PersonMovie.objects.create(person_id=director, movie=movie, category='director')
+            PersonMovie.objects.create(person_id=form.data['director'], movie=movie, category='director')
 
             return HttpResponseRedirect(reverse_lazy('movies:movie_details', kwargs={'id': movie.id}))
+    else:
+        form = MovieForm()
+    return render(request, 'movies/add_movie.html', context={'form': form})
 
-    return render(request, 'movies/add.html', context={'error': error,
-                                                       'name': name,
-                                                       'year': year,
-                                                       'persons': Person.objects.all(),
-                                                       'director': director})
+
+def person_add(request):
+    if request.method == 'POST':
+        form = PersonForm(request.POST)
+
+        if form.is_valid():
+
+            if form.data.get('death_year'):
+                death_year = form.data.get('death_year')
+            else:
+                death_year = None
+
+            person = Person.objects.create(name=form.data['name'],
+                                           birth_year=form.data['birth_year'],
+                                           death_year=death_year)
+
+            #  added 'uap'(user add person) to demarcate imdb data and user input data
+            person.imdb_id = 'uap' + str(person.id)
+            person.save()
+
+            PersonMovie.objects.create(person=person,
+                                       category=form.data['category'],
+                                       job=form.data['job'],
+                                       characters=list(form.data['characters'].split(',')))
+
+            return HttpResponseRedirect(reverse_lazy('movies:movie_list'))
+    else:
+        form = PersonForm()
+    return render(request, 'movies/add_person.html', context={'form': form})
 
 
 def long_running(request):
