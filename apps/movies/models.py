@@ -14,6 +14,7 @@ class Movie(models.Model):
     is_adult = models.BooleanField(_('Adult rated'), default=False)
     year = models.DateField(_('Release year'), null=True)
     genres = ArrayField(models.CharField(_('Genres'), max_length=80, default=list))
+    persons_participating = models.ManyToManyField('movies.Person', through='PersonMovie')
 
     @property
     def director(self):
@@ -32,6 +33,7 @@ class Person(models.Model):
     name = models.CharField(_('Name'), max_length=255, null=True, blank=True)
     birth_year = models.DateField(_('Birth date'), null=True, blank=True)
     death_year = models.DateField(_('Death date'), null=True)
+    movies_participating = models.ManyToManyField('movies.Movie', through='PersonMovie')
 
     def __str__(self):
         return f'{self.name}'
