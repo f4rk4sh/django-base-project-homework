@@ -5,7 +5,6 @@ import logging
 from django.urls import reverse_lazy
 from apps.movies.models import Movie, Person, PersonMovie
 from .forms import MovieForm, PersonForm
-from django.db.models import Count, Q, Subquery, Sum
 from django.db import connection
 
 logger = logging.getLogger(__name__)
@@ -48,13 +47,18 @@ def person_add(request):
 
         if form.is_valid():
 
+            if form.data.get('birth_year'):
+                birth_year = form.data.get('birth_year')
+            else:
+                birth_year = None
+
             if form.data.get('death_year'):
                 death_year = form.data.get('death_year')
             else:
                 death_year = None
 
             person = Person.objects.create(name=form.data['name'],
-                                           birth_year=form.data['birth_year'],
+                                           birth_year=birth_year,
                                            death_year=death_year)
 
             #  added 'uap'(user add person) to demarcate imdb data and user input data

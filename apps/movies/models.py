@@ -31,7 +31,7 @@ class Movie(models.Model):
 class Person(models.Model):
     imdb_id = models.CharField(_('nconst'), max_length=10, null=True, blank=True)
     name = models.CharField(_('Name'), max_length=255, null=True, blank=True)
-    birth_year = models.DateField(_('Birth date'), null=True, blank=True)
+    birth_year = models.DateField(_('Birth date'), null=True)
     death_year = models.DateField(_('Death date'), null=True)
     movies_participating = models.ManyToManyField('movies.Movie', through='PersonMovie')
 
