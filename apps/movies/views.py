@@ -5,7 +5,7 @@ import logging
 from django.urls import reverse_lazy
 from apps.movies.models import Movie, Person, PersonMovie
 from .forms import MovieForm, PersonForm
-from django.db.models import Count, Q, Subquery
+from django.db.models import Count, Q, Subquery, Sum
 from django.db import connection
 
 logger = logging.getLogger(__name__)
@@ -73,10 +73,6 @@ def person_add(request):
 
 
 def rating(request):
-    actors_rating = Person.objects.filter(
-        Q(personmovie__category='actor') | Q(personmovie__category='actress') | Q(personmovie__category='self')
-    ).annotate(num_movies=Count('movies_participating')).order_by('-num_movies')[:20]
-
     with connection.cursor() as cursor:
         cursor.execute('''
             SELECT movies_movie.name, sum(sq.rating) as rating from movies_movie
@@ -91,9 +87,32 @@ def rating(request):
             group by movies_movie.id
             order by rating desc;
             ''')
-        movies_rating = cursor.fetchall()
-
-    return render(request, 'movies/rating.html', context={'actors_rating': actors_rating, 'movies_rating': movies_rating})
+        all_movies_rating = cursor.fetchall()
+        cursor.execute('''
+            SELECT movies_person.name, sum(sq.rating) as rating from movies_person
+            join movies_personmovie on movies_personmovie.person_id = movies_person.id
+            join (Select movies_movie.id as "movie_id", sum(sq.rating) as rating from movies_movie
+            join movies_personmovie on movies_personmovie.movie_id = movies_movie.id
+            join (Select movies_person.id AS "person_id", count(*) as rating from movies_person
+            join public.movies_personmovie on movies_person.id = movies_personmovie.person_id
+            where
+                movies_personmovie.category = 'actor' or
+                movies_personmovie.category = 'actress' or
+                movies_personmovie.category = 'self'  
+            group by movies_person.id) as sq on sq.person_id = movies_personmovie.person_id
+            group by movies_movie.id) as sq on sq.movie_id = movies_personmovie.movie_id
+            where
+                movies_personmovie.category = 'actor' or
+                movies_personmovie.category = 'actress' or
+                movies_personmovie.category = 'self'
+            group by movies_person.name
+            order by rating DESC;
+        ''')
+        all_actors_rating = cursor.fetchall()
+    movies_rating = all_movies_rating[:20]
+    actors_rating = all_actors_rating[:20]
+    return render(request, 'movies/rating.html', context={'actors_rating': actors_rating,
+                                                          'movies_rating': movies_rating})
 
 
 def long_running(request):
