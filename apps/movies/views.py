@@ -1,4 +1,4 @@
-from django.http import HttpResponse, HttpResponseRedirect
+from django.http import HttpResponse
 from django.shortcuts import render
 from time import sleep
 import logging
@@ -6,121 +6,103 @@ from django.urls import reverse_lazy
 from apps.movies.models import Movie, Person, PersonMovie
 from .forms import MovieForm, PersonForm
 from django.db import connection
+from django.views.generic import ListView, DetailView, CreateView, UpdateView, View
+
 
 logger = logging.getLogger(__name__)
 
 
-def movie_list(request):
-    return render(request, 'movies/list.html', context={'movies': Movie.objects.order_by('-year').all()[:20]})
+class SearchMixin:
+    def get_queryset(self):
+        queryset = super().get_queryset()
+        return queryset.filter(name__icontains=self.request.GET.get('q', ''))
 
 
-def movie_details(request, **kwargs):
-    return render(request, 'movies/detail.html', context={'movie': Movie.objects.get(id=kwargs.get('id'))})
+class MovieListView(SearchMixin, ListView):
+    template_name = 'movies/list.html'
+    model = Movie
+    paginate_by = 18
 
 
-def movie_add(request):
-    if request.method == 'POST':
-        form = MovieForm(request.POST)
-
-        if form.is_valid():
-            movie = Movie.objects.create(name=form.data['name'],
-                                         title_type=form.data['title_type'],
-                                         is_adult=form.data.get('is_adult') == 'on',
-                                         year=form.data['year'],
-                                         genres=list(form.data['genres'].split(',')))
-
-            #  added 'uam'(user add movie) to demarcate imdb data and user input data
-            movie.imdb_id = 'uam' + str(movie.id)
-            movie.save()
-
-            PersonMovie.objects.create(person_id=form.data['director'], movie=movie, category='director')
-
-            return HttpResponseRedirect(reverse_lazy('movies:movie_details', kwargs={'id': movie.id}))
-    else:
-        form = MovieForm()
-    return render(request, 'movies/add_movie.html', context={'form': form})
+class MovieDetailView(DetailView):
+    template_name = 'movies/detail.html'
+    model = Movie
 
 
-def person_add(request):
-    if request.method == 'POST':
-        form = PersonForm(request.POST)
+class MovieCreateView(CreateView):
+    template_name = 'movies/add_movie.html'
+    model = Movie
+    form_class = MovieForm
 
-        if form.is_valid():
-
-            if form.data.get('birth_year'):
-                birth_year = form.data.get('birth_year')
-            else:
-                birth_year = None
-
-            if form.data.get('death_year'):
-                death_year = form.data.get('death_year')
-            else:
-                death_year = None
-
-            person = Person.objects.create(name=form.data['name'],
-                                           birth_year=birth_year,
-                                           death_year=death_year)
-
-            #  added 'uap'(user add person) to demarcate imdb data and user input data
-            person.imdb_id = 'uap' + str(person.id)
-            person.save()
-
-            PersonMovie.objects.create(person=person,
-                                       category=form.data['category'],
-                                       job=form.data['job'],
-                                       characters=list(form.data['characters'].split(',')))
-
-            return HttpResponseRedirect(reverse_lazy('movies:movie_list'))
-    else:
-        form = PersonForm()
-    return render(request, 'movies/add_person.html', context={'form': form})
+    def get_success_url(self):
+        return reverse_lazy('movies:movie_details', kwargs={'pk': self.object.pk})
 
 
-def rating(request):
-    with connection.cursor() as cursor:
-        cursor.execute('''
-            SELECT movies_movie.name, sum(sq.rating) as rating from movies_movie
-            join movies_personmovie on movies_personmovie.movie_id = movies_movie.id
-            join (Select movies_person.id AS "person_id", count(*) as rating from movies_person
-            left outer join public.movies_personmovie on movies_person.id = movies_personmovie.person_id
-            where
-                movies_personmovie.category = 'actor' or
-                movies_personmovie.category = 'actress' or
-                movies_personmovie.category = 'self'  
-            group by movies_person.id) as sq on sq.person_id = movies_personmovie.person_id
-            group by movies_movie.id
-            order by rating desc;
+class MovieUpdateView(UpdateView):
+    template_name = 'movies/update_movie.html'
+    model = Movie
+    form_class = MovieForm
+
+    def get_success_url(self):
+        return reverse_lazy('movies:movie_details', kwargs={'pk': self.object.pk})
+
+
+class PersonCreateView(CreateView):
+    template_name = 'movies/add_person.html'
+    model = Person
+    form_class = PersonForm
+    success_url = reverse_lazy('movies:movie_list')
+
+
+class RatingView(View):
+    @staticmethod
+    def get(request):
+        with connection.cursor() as cursor:
+            cursor.execute('''
+                SELECT movies_movie.name, sum(sq.rating) as rating from movies_movie
+                join movies_personmovie on movies_personmovie.movie_id = movies_movie.id
+                join (Select movies_person.id AS "person_id", count(*) as rating from movies_person
+                left outer join public.movies_personmovie on movies_person.id = movies_personmovie.person_id
+                where
+                    movies_personmovie.category = 'actor' or
+                    movies_personmovie.category = 'actress' or
+                    movies_personmovie.category = 'self'  
+                group by movies_person.id) as sq on sq.person_id = movies_personmovie.person_id
+                group by movies_movie.id
+                order by rating desc;
+                ''')
+            all_movies_rating = cursor.fetchall()
+            cursor.execute('''
+                SELECT movies_person.name, sum(sq.rating) as rating from movies_person
+                join movies_personmovie on movies_personmovie.person_id = movies_person.id
+                join (Select movies_movie.id as "movie_id", sum(sq.rating) as rating from movies_movie
+                join movies_personmovie on movies_personmovie.movie_id = movies_movie.id
+                join (Select movies_person.id AS "person_id", count(*) as rating from movies_person
+                join public.movies_personmovie on movies_person.id = movies_personmovie.person_id
+                where
+                    movies_personmovie.category = 'actor' or
+                    movies_personmovie.category = 'actress' or
+                    movies_personmovie.category = 'self'  
+                group by movies_person.id) as sq on sq.person_id = movies_personmovie.person_id
+                group by movies_movie.id) as sq on sq.movie_id = movies_personmovie.movie_id
+                where
+                    movies_personmovie.category = 'actor' or
+                    movies_personmovie.category = 'actress' or
+                    movies_personmovie.category = 'self'
+                group by movies_person.name
+                order by rating DESC;
             ''')
-        all_movies_rating = cursor.fetchall()
-        cursor.execute('''
-            SELECT movies_person.name, sum(sq.rating) as rating from movies_person
-            join movies_personmovie on movies_personmovie.person_id = movies_person.id
-            join (Select movies_movie.id as "movie_id", sum(sq.rating) as rating from movies_movie
-            join movies_personmovie on movies_personmovie.movie_id = movies_movie.id
-            join (Select movies_person.id AS "person_id", count(*) as rating from movies_person
-            join public.movies_personmovie on movies_person.id = movies_personmovie.person_id
-            where
-                movies_personmovie.category = 'actor' or
-                movies_personmovie.category = 'actress' or
-                movies_personmovie.category = 'self'  
-            group by movies_person.id) as sq on sq.person_id = movies_personmovie.person_id
-            group by movies_movie.id) as sq on sq.movie_id = movies_personmovie.movie_id
-            where
-                movies_personmovie.category = 'actor' or
-                movies_personmovie.category = 'actress' or
-                movies_personmovie.category = 'self'
-            group by movies_person.name
-            order by rating DESC;
-        ''')
-        all_actors_rating = cursor.fetchall()
-    movies_rating = all_movies_rating[:20]
-    actors_rating = all_actors_rating[:20]
-    return render(request, 'movies/rating.html', context={'actors_rating': actors_rating,
-                                                          'movies_rating': movies_rating})
+            all_actors_rating = cursor.fetchall()
+        movies_rating = all_movies_rating[:20]
+        actors_rating = all_actors_rating[:20]
+        return render(request, 'movies/rating.html', context={'actors_rating': actors_rating,
+                                                              'movies_rating': movies_rating})
 
 
-def long_running(request):
-    logger.error('starting...')
-    sleep(10)
-    logger.error('Ok')
-    return HttpResponse('Ok')
+class LongRunningView(View):
+    @staticmethod
+    def get(request):
+        logger.error('starting...')
+        sleep(10)
+        logger.error('Ok')
+        return HttpResponse('Ok')

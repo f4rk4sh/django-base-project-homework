@@ -9,10 +9,6 @@ class MovieForm(ModelForm):
     class Meta:
         model = Movie
         exclude = ['imdb_id']
-        widgets = {
-            'year': forms.SelectDateWidget,
-            'persons_participating': forms.S,
-        }
 
     director_list = []
     for person in Person.objects.all():
@@ -28,10 +24,6 @@ class PersonForm(ModelForm):
     class Meta:
         model = Person
         exclude = ['imdb_id']
-        widgets = {
-            'birth_year': forms.SelectDateWidget,
-            'death_year': forms.SelectDateWidget,
-        }
 
     CATEGORY_CHOICES = [
         ('', '--------'),
