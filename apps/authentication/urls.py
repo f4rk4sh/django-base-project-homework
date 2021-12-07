@@ -1,9 +1,10 @@
 from django.urls import path
-from .views import my_view, list_users
+from .views import UserView, UserListView, RegisterView
 
 app_name = 'apps.authentication'
 
 urlpatterns = [
-    path('', my_view, name='home'),
-    path('list/', list_users, name='list-users')
+    path('', UserView.as_view(), name='user'),
+    path('users/', UserListView.as_view(), name='users'),
+    path('register/', RegisterView.as_view(), name='register'),
 ]

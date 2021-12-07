@@ -1,0 +1,17 @@
+{%  extends 'base.html' %}
+
+{% block title %}
+    | User info
+{% endblock title %}
+
+{% block content %}
+    <h1>Hi, {{ user.username }}!</h1>
+    <div>
+        Registration date: {{ user.date_joined }}<br>
+        User status: {% if user.is_superuser %} admin {% else %} regular {% endif %}<br>
+        Email: {{ user.email }}<br>
+        Last log in: {{ user.last_login }}<br>
+        <a href="javascript:history.back()" role="button" class="btn btn-primary">Back</a>
+    </div>
+
+{% endblock content %}
