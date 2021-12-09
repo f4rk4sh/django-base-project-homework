@@ -6,7 +6,7 @@ from django.urls import reverse_lazy
 from apps.movies.models import Movie, Person, PersonMovie
 from .forms import MovieForm, PersonForm
 from django.db import connection
-from django.views.generic import ListView, DetailView, CreateView, UpdateView, View
+from django.views.generic import ListView, DetailView, CreateView, UpdateView, TemplateView, View
 from django.contrib.auth.mixins import LoginRequiredMixin
 
 
@@ -55,24 +55,12 @@ class PersonCreateView(LoginRequiredMixin, CreateView):
     success_url = reverse_lazy('movies:movie_list')
 
 
-class RatingView(View):
+class RatingView(TemplateView):
+    template_name = 'movies/rating.html'
+
     @staticmethod
-    def get(request):
+    def actors_rating():
         with connection.cursor() as cursor:
-            cursor.execute('''
-                SELECT movies_movie.name, sum(sq.rating) as rating from movies_movie
-                join movies_personmovie on movies_personmovie.movie_id = movies_movie.id
-                join (Select movies_person.id AS "person_id", count(*) as rating from movies_person
-                left outer join public.movies_personmovie on movies_person.id = movies_personmovie.person_id
-                where
-                    movies_personmovie.category = 'actor' or
-                    movies_personmovie.category = 'actress' or
-                    movies_personmovie.category = 'self'  
-                group by movies_person.id) as sq on sq.person_id = movies_personmovie.person_id
-                group by movies_movie.id
-                order by rating desc;
-                ''')
-            all_movies_rating = cursor.fetchall()
             cursor.execute('''
                 SELECT movies_person.name, sum(sq.rating) as rating from movies_person
                 join movies_personmovie on movies_personmovie.person_id = movies_person.id
@@ -94,10 +82,34 @@ class RatingView(View):
                 order by rating DESC;
             ''')
             all_actors_rating = cursor.fetchall()
-        movies_rating = all_movies_rating[:20]
         actors_rating = all_actors_rating[:20]
-        return render(request, 'movies/rating.html', context={'actors_rating': actors_rating,
-                                                              'movies_rating': movies_rating})
+        return actors_rating
+
+    @staticmethod
+    def movies_rating():
+        with connection.cursor() as cursor:
+            cursor.execute('''
+                SELECT movies_movie.name, sum(sq.rating) as rating from movies_movie
+                join movies_personmovie on movies_personmovie.movie_id = movies_movie.id
+                join (Select movies_person.id AS "person_id", count(*) as rating from movies_person
+                left outer join public.movies_personmovie on movies_person.id = movies_personmovie.person_id
+                where
+                    movies_personmovie.category = 'actor' or
+                    movies_personmovie.category = 'actress' or
+                    movies_personmovie.category = 'self'  
+                group by movies_person.id) as sq on sq.person_id = movies_personmovie.person_id
+                group by movies_movie.id
+                order by rating desc;
+            ''')
+            all_movies_rating = cursor.fetchall()
+        movies_rating = all_movies_rating[:20]
+        return movies_rating
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['actors_rating'] = self.actors_rating()
+        context['movies_rating'] = self.movies_rating()
+        return context
 
 
 class LongRunningView(View):
