@@ -49,8 +49,8 @@ def loaddump(ctx):
 def run(ctx):
     print('Migrating db')
     ctx.run('./manage.py migrate')
-    # print('Collecting static')
-    # ctx.run('./manage.py collectstatic --noinput')
+    print('Collecting static')
+    ctx.run('./manage.py collectstatic --noinput')
 
     cmd = ('uwsgi --http 0.0.0.0:8000 --master '
            '--module "django.core.wsgi:get_wsgi_application()" '
