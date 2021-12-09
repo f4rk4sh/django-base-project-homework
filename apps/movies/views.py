@@ -7,6 +7,7 @@ from apps.movies.models import Movie, Person, PersonMovie
 from .forms import MovieForm, PersonForm
 from django.db import connection
 from django.views.generic import ListView, DetailView, CreateView, UpdateView, View
+from django.contrib.auth.mixins import LoginRequiredMixin
 
 
 logger = logging.getLogger(__name__)
@@ -29,7 +30,7 @@ class MovieDetailView(DetailView):
     model = Movie
 
 
-class MovieCreateView(CreateView):
+class MovieCreateView(LoginRequiredMixin, CreateView):
     template_name = 'movies/add_movie.html'
     model = Movie
     form_class = MovieForm
@@ -38,7 +39,7 @@ class MovieCreateView(CreateView):
         return reverse_lazy('movies:movie_details', kwargs={'pk': self.object.pk})
 
 
-class MovieUpdateView(UpdateView):
+class MovieUpdateView(LoginRequiredMixin, UpdateView):
     template_name = 'movies/update_movie.html'
     model = Movie
     form_class = MovieForm
@@ -47,7 +48,7 @@ class MovieUpdateView(UpdateView):
         return reverse_lazy('movies:movie_details', kwargs={'pk': self.object.pk})
 
 
-class PersonCreateView(CreateView):
+class PersonCreateView(LoginRequiredMixin, CreateView):
     template_name = 'movies/add_person.html'
     model = Person
     form_class = PersonForm
