@@ -124,6 +124,7 @@ dmypy.json
 # http://iamzed.com/2009/05/07/a-primer-on-virtualenv/
 pyvenv.cfg
 .env
+.db_env
 .venv
 env/
 venv/
@@ -155,7 +156,6 @@ yarn-error.log
 .vscode
 
 static
-.env
 xmlrunner
 frontend/dist
 frontend-dist
