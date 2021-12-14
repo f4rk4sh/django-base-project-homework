@@ -11,7 +11,6 @@ https://docs.djangoproject.com/en/3.2/ref/settings/
 """
 import os
 from pathlib import Path
-from django.apps import apps
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 from IPython.lib.clipboard import osx_clipboard_get
@@ -31,12 +30,11 @@ DEBUG = True
 ALLOWED_HOSTS = []
 
 
-
 # Application definition
 
 INSTALLED_APPS = [
-    'apps.movies',
-    'apps.authentication',
+    'apps.movies.apps.MoviesConfig',
+    'apps.authentication.apps.AuthenticationConfig',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -143,8 +141,8 @@ LOGOUT_REDIRECT_URL = '/'
 
 CRISPY_TEMPLATE_PACK = 'bootstrap4'
 
+AUTH_USER_MODEL = 'authentication.User'
+
 CELERY_TIMEZONE = 'Europe/Kiev'
 CELERY_TASK_TRACK_STARTED = True
 CELERY_TASK_TIME_LIMIT = 30 * 60
-
-AUTH_USER_MODEL = 'authentication.User'
