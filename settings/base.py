@@ -33,8 +33,6 @@ ALLOWED_HOSTS = []
 # Application definition
 
 INSTALLED_APPS = [
-    'apps.movies.apps.MoviesConfig',
-    'apps.authentication.apps.AuthenticationConfig',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -44,6 +42,8 @@ INSTALLED_APPS = [
     'bootstrapform',
     'bootstrap_pagination',
     'crispy_forms',
+    'apps.movies.apps.MoviesConfig',
+    'apps.authentication.apps.AuthenticationConfig'
 ]
 
 MIDDLEWARE = [
@@ -140,9 +140,3 @@ LOGIN_REDIRECT_URL = '/'
 LOGOUT_REDIRECT_URL = '/'
 
 CRISPY_TEMPLATE_PACK = 'bootstrap4'
-
-AUTH_USER_MODEL = 'authentication.User'
-
-CELERY_TIMEZONE = 'Europe/Kiev'
-CELERY_TASK_TRACK_STARTED = True
-CELERY_TASK_TIME_LIMIT = 30 * 60

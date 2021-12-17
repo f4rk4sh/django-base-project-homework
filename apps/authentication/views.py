@@ -2,11 +2,9 @@ from django.contrib.auth import get_user_model
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.urls import reverse_lazy
 from django.views.generic import TemplateView, FormView
-from apps.authentication.forms import UserCreateForm
-from django.shortcuts import redirect
-from django.http import Http404
+from .forms import UserCreateForm
 
-UserModel = get_user_model()
+User = get_user_model()
 
 
 class UserView(LoginRequiredMixin, TemplateView):
@@ -14,7 +12,7 @@ class UserView(LoginRequiredMixin, TemplateView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['user'] = UserModel.objects.get(username=self.request.user)
+        context['user'] = User.objects.get(username=self.request.user)
         return context
 
 
@@ -23,7 +21,7 @@ class UserListView(LoginRequiredMixin, TemplateView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['users'] = UserModel.objects.all()
+        context['users'] = User.objects.all()
         return context
 
 
@@ -33,22 +31,5 @@ class RegisterView(FormView):
     success_url = reverse_lazy('authentication:user')
 
     def form_valid(self, form):
-        email = form.data.get('email')
-        send_registration_mail.delay(email)
+        form.save()
         return super().form_valid(form)
-
-
-def home(request):
-    return reverse_lazy('authentication:user')
-
-
-def verify(request, uuid):
-    try:
-        user = UserModel.objects.get(verification_uuid=uuid, is_active=False)
-    except UserModel.DoesNotExist:
-        raise Http404("User does not exist or is already verified")
-
-    user.is_active = True
-    user.save()
-
-    return redirect('home')

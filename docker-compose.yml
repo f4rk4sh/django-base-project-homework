@@ -24,18 +24,6 @@ services:
       /bin/bash -c "pip install -r requirements.txt; invoke run"
     depends_on:
       - db
-      - redis
-  redis:
-    image: redis:alpine
-  celery:
-    build: .
-    volumes:
-      - .:/src
-    command:
-      /bin/bash -c "pip install -r requirements.txt; celery -A settings.celery worker -l INFO"
-    depends_on:
-      - web
-      - redis
   db:
     image: postgres:11.5
     ports:
