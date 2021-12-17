@@ -12,7 +12,7 @@ class MovieForm(ModelForm):
 
     director_list = []
     for person in Person.objects.all():
-        if person.movies.filter(category='director'):
+        if person.personmovie_set.filter(category='director'):
             director_list.append(person)
         else:
             continue
