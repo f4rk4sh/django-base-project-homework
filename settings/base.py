@@ -29,12 +29,15 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'django.contrib.sites',
     'bootstrapform',
     'bootstrap_pagination',
     'crispy_forms',
     'apps.movies.apps.MoviesConfig',
     'apps.authentication.apps.AuthenticationConfig'
 ]
+
+SITE_ID = 1
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
