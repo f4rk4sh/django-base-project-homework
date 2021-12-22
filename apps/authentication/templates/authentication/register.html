@@ -20,6 +20,19 @@
             {% endfor %}
         </div>
         {% endfor %}<br>
-        <button type="submit">Sign up</button>
+        <button type="submit" class="btn btn-primary">Sign up</button>
     </form>
 {% endblock %}
+
+{% block footer %}
+<div>
+    {% if messages %}
+        {% for message in messages %}
+            <div class="alert alert-{{ message.tags }}">
+                {{ message }}
+            </div>
+        {% endfor %}
+    {% endif  %}
+</div>
+{% endblock %}
+
