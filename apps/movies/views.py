@@ -1,13 +1,12 @@
-from django.http import HttpResponse
-from django.shortcuts import render
-from time import sleep
-import logging
-from django.urls import reverse_lazy
-from apps.movies.models import Movie, Person, PersonMovie
-from .forms import MovieForm, PersonForm
-from django.db import connection
 from django.views.generic import ListView, DetailView, CreateView, UpdateView, TemplateView, View
 from django.contrib.auth.mixins import LoginRequiredMixin
+from apps.movies.models import Movie, Person
+from .forms import MovieForm, PersonForm
+from django.urls import reverse_lazy
+from django.db import connection
+from django.http import HttpResponse
+from time import sleep
+import logging
 
 
 logger = logging.getLogger(__name__)
@@ -22,7 +21,7 @@ class SearchMixin:
 class MovieListView(SearchMixin, ListView):
     template_name = 'movies/list.html'
     model = Movie
-    paginate_by = 18
+    paginate_by = 20
 
 
 class MovieDetailView(DetailView):

@@ -1,10 +1,13 @@
 {% extends 'base.html' %}
 
+{% block title %}
+    | Ratings
+{%endblock%}
+
 {% block content%}
-    <h1>Ratings</h1>
     <div class="col-md-6">
         <div class="card-body">
-            <h2>Actors rating:</h2>
+            <h4>Actors rating:</h4>
             {% for el in actors_rating %}
             {{ el|join:': '}} point(s)<br>
             {% endfor %}
@@ -13,7 +16,7 @@
 
     <div class="col-md-6">
         <div class="card-body">
-            <h2>Movies rating:</h2>
+            <h4>Movies rating:</h4>
             {% for el in movies_rating %}
             {{ el|join:': ' }} point(s)<br>
             {% endfor %}
@@ -21,7 +24,7 @@
     </div>
     <div class="col-md-3">
         <div class="card-body">
-           <a href="javascript:history.back()" role="button" class="btn btn-primary">Back</a>
+           <a href="javascript:history.back()" role="button" class="btn btn-dark">Back</a>
         </div>
     </div>
 {% endblock %}

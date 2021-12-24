@@ -1,7 +1,7 @@
 {% extends 'base.html' %}
 
 {% block title %}
-    | Register
+    | Sign up
 {% endblock title %}
 
 {% block content %}
@@ -20,12 +20,13 @@
             {% endfor %}
         </div>
         {% endfor %}<br>
-        <button type="submit" class="btn btn-primary">Sign up</button>
+        <button type="submit" class="btn btn-dark">Sign up</button>
+        <a href="javascript:history.back()" role="button" class="btn btn-dark">Back</a>
     </form>
 {% endblock %}
 
 {% block footer %}
-<div>
+<div class="col-md-3">
     {% if messages %}
         {% for message in messages %}
             <div class="alert alert-{{ message.tags }}">

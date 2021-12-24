@@ -1,5 +1,9 @@
 {% extends 'base.html' %}
 
+{% block title %}
+    | Details
+{%endblock%}
+
 {% block content %}
     <h1>{{ object.name }}</h1>
         <p>Type of a title: {{ object.title_type }}</p>
@@ -31,8 +35,8 @@
         </table>
     <div class="col-md-3">
         <div class="card-body">
-            <a href="{% url 'movies:movie_update' pk=movie.id%}" role="button" class="btn btn-primary">Update movie</a>
-            <a href="javascript:history.back()" role="button" class="btn btn-primary">Back</a>
+            <a href="{% url 'movies:movie_update' pk=movie.id%}" role="button" class="btn btn-dark">Update movie</a>
+            <a href="javascript:history.back()" role="button" class="btn btn-dark">Back</a>
         </div>
     </div>
 {% endblock content %}

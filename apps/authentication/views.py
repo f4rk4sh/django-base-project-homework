@@ -36,9 +36,9 @@ class UserListView(LoginRequiredMixin, TemplateView):
 
 
 class SignUpView(SuccessMessageMixin, CreateView):
-    template_name = 'authentication/register.html'
+    template_name = 'authentication/signup.html'
     form_class = SignupForm
-    success_url = reverse_lazy('authentication:register')
+    success_url = reverse_lazy('authentication:signup')
     success_message = 'Please confirm your email address to complete the registration'
 
     def form_valid(self, form):
@@ -53,7 +53,7 @@ class SignUpView(SuccessMessageMixin, CreateView):
                 'token': account_activation_token.make_token(self.object),
                 }
         subject = 'Activate your account'
-        message = render_to_string('authentication/acc_active_email.html', body)
+        message = render_to_string('authentication/email_confirmation.html', body)
         recipient = self.object.email
         send_verification_email.delay(subject, message, recipient)
         return super().form_valid(form)

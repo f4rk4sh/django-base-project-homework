@@ -14,7 +14,8 @@
                 <li>{{ user }} ({% if user.is_superuser %} admin {% else %} regular {% endif %}): {{ user.email }}</li>
             {% endfor %}
             </ul>
-            <a href="javascript:history.back()" role="button" class="btn btn-primary">Back</a>
+            <br>
+            <a href="javascript:history.back()" role="button" class="btn btn-dark">Back</a>
         </div>
     </div>
 {% endblock content %}

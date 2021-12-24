@@ -1,4 +1,9 @@
 {% extends 'base.html' %}
+
+{% block title %}
+    | Update movie
+{%endblock%}
+
 {% load bootstrap %}
 {% block content %}
     <div class="row">
@@ -9,8 +14,8 @@
                 {{ form|bootstrap }}
                 <br>
                 <div class="form-group">
-                    <button type="submit" value="Update" class="btn btn-primary">Update</button>
-                    <a href="javascript:history.back(-2)" role="button" class="btn btn-primary">Back</a>
+                    <button type="submit" value="Update" class="btn btn-dark">Update</button>
+                    <a href="javascript:history.back(-2)" role="button" class="btn btn-dark">Back</a>
                 </div>
             </form>
         </div>
