@@ -1,17 +1,18 @@
 from django.contrib.auth import get_user_model
 from django.contrib.auth.mixins import LoginRequiredMixin
+from django.views.generic import TemplateView, CreateView, View
 from django.contrib.messages.views import SuccessMessageMixin
-from django.urls import reverse_lazy
-from django.views.generic import TemplateView, View, CreateView
 from .forms import SignupForm
-from django.http import HttpResponse
-from django.contrib.auth import login
+from django.urls import reverse_lazy
 from django.contrib.sites.shortcuts import get_current_site
 from django.utils.encoding import force_bytes, force_text
-from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
-from django.template.loader import render_to_string
+from django.http import HttpResponse, HttpResponseRedirect
 from .tokens import account_activation_token
+from django.template.loader import render_to_string
 from .tasks import send_verification_email
+from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
+from django.contrib.auth import login
+
 
 User = get_user_model()
 
@@ -69,6 +70,6 @@ class ActivateView(View):
             user.is_active = True
             user.save()
             login(request, user)
-            return HttpResponse('Thank you for your email confirmation. Now you can login your account.')
+            return HttpResponseRedirect(reverse_lazy('movies:movie_list'))
         else:
             return HttpResponse('Activation link is invalid!')
