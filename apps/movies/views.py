@@ -21,12 +21,14 @@ class SearchMixin:
 class MovieListView(SearchMixin, ListView):
     template_name = 'movies/list.html'
     model = Movie
+    context_object_name = 'movies'
     paginate_by = 20
 
 
 class MovieDetailView(DetailView):
     template_name = 'movies/detail.html'
     model = Movie
+    context_object_name = 'movie'
 
 
 class MovieCreateView(LoginRequiredMixin, CreateView):
@@ -81,7 +83,7 @@ class RatingView(TemplateView):
                 order by rating DESC;
             ''')
             all_actors_rating = cursor.fetchall()
-        actors_rating = all_actors_rating[:20]
+        actors_rating = all_actors_rating[:10]
         return actors_rating
 
     @staticmethod
@@ -101,7 +103,7 @@ class RatingView(TemplateView):
                 order by rating desc;
             ''')
             all_movies_rating = cursor.fetchall()
-        movies_rating = all_movies_rating[:20]
+        movies_rating = all_movies_rating[:10]
         return movies_rating
 
     def get_context_data(self, **kwargs):

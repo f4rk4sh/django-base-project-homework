@@ -5,13 +5,12 @@
 {% endblock title %}
 
 {% block content %}
-    <h1>Hi, {{ user.username }}!</h1>
-    <div>
-        Registration date: {{ user.date_joined }}<br>
-        User status: {% if user.is_superuser %} admin {% else %} regular {% endif %}<br>
-        Email: {{ user.email }}<br>
-        Last log in: {{ user.last_login }}<br>
-        <br>
+    <div class="col-md-3">
+        <h4>Hi, {{ user.username }}!</h4>
+            <p>Registration date: {{ user.date_joined }}</p>
+            <p>User status: {% if user.is_superuser %} admin {% else %} regular {% endif %}</p>
+            <p>Email: {{ user.email }}</p>
+            <p>Last log in: {{ user.last_login }}</p>
         <a href="javascript:history.back()" role="button" class="btn btn-dark">Back</a>
     </div>
 

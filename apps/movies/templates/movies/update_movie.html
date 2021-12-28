@@ -2,22 +2,19 @@
 
 {% block title %}
     | Update movie
-{%endblock%}
+{% endblock %}
 
 {% load bootstrap %}
 {% block content %}
-    <div class="row">
-        <div class="col-md-3">
-            <form method="post">
-                <legend><h4>Update movie</h4></legend>
-                {% csrf_token %}
-                {{ form|bootstrap }}
-                <br>
-                <div class="form-group">
-                    <button type="submit" value="Update" class="btn btn-dark">Update</button>
-                    <a href="javascript:history.back(-2)" role="button" class="btn btn-dark">Back</a>
-                </div>
-            </form>
-        </div>
+    <div class="col-md-3">
+        <form method="post">
+            <h4>Update movie</h4>
+            {% csrf_token %}
+            {{ form|bootstrap }} <br>
+            <div class="form-group">
+                <button type="submit" value="Update" class="btn btn-dark">Update</button>
+                <a href="javascript:history.back(-2)" role="button" class="btn btn-dark">Back</a>
+            </div>
+        </form>
     </div>
 {% endblock %}

@@ -3,24 +3,26 @@
 
 {% block title %}
     | Movies
-{%endblock%}
+{% endblock %}
 
 {% block content %}
-    {% for movie in object_list %}
-        <div class="col-md-3">
-            <a href="{% url 'movies:movie_details' pk=movie.id %}" style="text-decoration: none; color: black;">
+{% for movie in movies %}
+    <div class="col-md-3">
+        <a href="{% url 'movies:movie_details' pk=movie.id %}" class="movies-list">
             <img src="https://i.ytimg.com/vi/z9qOOfVipdw/hqdefault.jpg" class="card-img-top" alt="...">
             <div class="card-body">
-                <h3>{{ movie.name }}</h3>
-                <p>Directed by: {{ movie.director }},
-                    released in: {{ movie.year }}
-                    {% if movie.is_adult %},  PG: 18 {% endif %}</p>
+                <h4>{{ movie.name }}</h4>
+                    <p>Directed by: {{ movie.director }}</p>
+                    <p>Released in: {{ movie.year }}</p>
+                    {% if movie.is_adult %}
+                        <p>PG: 18</p>
+                    {% endif %}
                     {% for genre in movie.genres %}
                         <span class="badge bg-dark text-light">{{ genre }}</span>
                     {% endfor %}
             </div>
-            </a>
-        </div>
-    {% endfor %}
-    {% bootstrap_paginate page_obj range=10 %}
+        </a>
+    </div>
+{% endfor %}
+{% bootstrap_paginate page_obj range=10 extra_pagination_classes="justify-content-center" %}
 {% endblock %}

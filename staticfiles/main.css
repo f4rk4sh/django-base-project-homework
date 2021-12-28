@@ -1,0 +1,16 @@
+.movies-list:link,
+.movies-list:visited,
+.movies-list:active {
+    text-decoration: none;
+    color: black;
+}
+
+.movies-list:hover {
+    text-decoration: none;
+    color: dimgray;
+}
+
+.participants {
+    width: 100%;
+}
+

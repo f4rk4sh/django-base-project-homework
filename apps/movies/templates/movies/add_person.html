@@ -3,20 +3,19 @@
 
 {% block title %}
     | Add person
-{%endblock%}
+{% endblock %}
 
 {% block content %}
-    <div class="row">
-        <div class="col-md-3">
-            <form method="post">
-                <legend><h4>Add person</h4></legend>
-                {% csrf_token %}
-                {{ form|bootstrap }} <br>
-                <div class="form-group">
-                    <button type="submit" class="btn btn-dark">Submit</button>
-                    <a href="javascript:history.back()" role="button" class="btn btn-dark">Back</a>
-                </div>
-            </form>
-        </div>
+    <div class="col-md-3">
+        <h4>Add person</h4>
+        <form method="post">
+            {% csrf_token %}
+            {{ form|bootstrap }} <br>
+            <div class="form-group">
+                <button type="submit" class="btn btn-dark">Submit</button>
+                <a href="javascript:history.back()" role="button" class="btn btn-dark">Back</a>
+            </div>
+        </form>
     </div>
+
 {% endblock %}

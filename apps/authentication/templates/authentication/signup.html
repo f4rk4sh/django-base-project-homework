@@ -1,39 +1,33 @@
 {% extends 'base.html' %}
+{% load crispy_forms_tags %}
 
 {% block title %}
     | Sign up
 {% endblock title %}
 
 {% block content %}
-    <h2>Sign up</h2>
-    <form method="post">
-        {% csrf_token %}
-        {% for field in form %}
-        <div>
-            {{ field.label_tag }}<br>
-            {{ field }}
-            {% if field.help_text %}
-            <small style="display: none">{{ field.help_text }}</small>
-            {% endif %}
-            {% for error in field.errors %}
-            <p style="color: red">{{ error }}</p>
-            {% endfor %}
-        </div>
-        {% endfor %}<br>
-        <button type="submit" class="btn btn-dark">Sign up</button>
-        <a href="javascript:history.back()" role="button" class="btn btn-dark">Back</a>
-    </form>
+    <div class="col-md-4">
+        <h4>Sign up</h4>
+        <form method="post">
+            {% csrf_token %}
+            {{ form|crispy }}
+            <div class="form-group">
+                <button type="submit" class="btn btn-dark">Sign up</button>
+                <a href="javascript:history.back()" role="button" class="btn btn-dark">Back</a>
+            </div>
+        </form>
+    </div>
 {% endblock %}
 
 {% block footer %}
-<div class="col-md-3">
-    {% if messages %}
-        {% for message in messages %}
-            <div class="alert alert-{{ message.tags }}">
-                {{ message }}
-            </div>
-        {% endfor %}
-    {% endif  %}
-</div>
+    <div class="col-md-3">
+        {% if messages %}
+            {% for message in messages %}
+                <div class="alert alert-{{ message.tags }}">
+                    {{ message }}
+                </div>
+            {% endfor %}
+        {% endif  %}
+    </div>
 {% endblock %}
 

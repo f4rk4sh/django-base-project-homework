@@ -2,26 +2,31 @@
 
 {% block title %}
     | Ratings
-{%endblock%}
+{% endblock %}
 
 {% block content%}
     <div class="col-md-6">
         <div class="card-body">
-            <h4>Actors rating:</h4>
-            {% for el in actors_rating %}
-            {{ el|join:': '}} point(s)<br>
+            <h4>Top 10 actors:</h4>
+            <ol>
+            {% for actor in actors_rating %}
+                <li>{{ actor|join:': '}} point(s)</li>
             {% endfor %}
+            </ol>
         </div>
     </div>
 
     <div class="col-md-6">
         <div class="card-body">
-            <h4>Movies rating:</h4>
-            {% for el in movies_rating %}
-            {{ el|join:': ' }} point(s)<br>
+            <h4>Top 10 movies:</h4>
+            <ol>
+            {% for movie in movies_rating %}
+                <li>{{ movie|join:': ' }} point(s)</li>
             {% endfor %}
+            </ol>
         </div>
     </div>
+
     <div class="col-md-3">
         <div class="card-body">
            <a href="javascript:history.back()" role="button" class="btn btn-dark">Back</a>

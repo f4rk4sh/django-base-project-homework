@@ -2,37 +2,50 @@
 
 {% block title %}
     | Details
-{%endblock%}
+{% endblock %}
 
 {% block content %}
-    <h1>{{ object.name }}</h1>
-        <p>Type of a title: {{ object.title_type }}</p>
-        {% if object.is_adult %}
-        <p> PG: 18</p>
-        {% endif %}
-        <p>Released in: {{ object.year }}</p>
-        <p>Genres: {{ object.genres|join:', ' }}</p>
-    <h1>Participants:</h1>
-        <table style="margin-left: 15px">
-            <thead>
-            <tr>
-                <td><h6>Name</h6></td>
-                <td><h6>Category</h6></td>
-                <td><h6>Job</h6></td>
-                <td><h6>Characters</h6></td>
-                </tr>
-            </thead>
-            <tbody>
-            {% for personmovie in object.personmovie_set.all %}
+    <div class="col-md-3">
+        <div class="card-body">
+            <h4>{{ movie.name }}</h4>
+                <p>Type of a title: {{ object.title_type }}</p>
+                <p>Directed by: {{ movie.director }}</p>
+                <p>Released in: {{ movie.year }}</p>
+                {% if movie.is_adult %}
+                    <p>PG: 18</p>
+                {% endif %}
+                {% for genre in movie.genres %}
+                    <span class="badge bg-dark text-light">{{ genre }}</span>
+                {% endfor %}
+        </div>
+    </div>
+
+    <div class="col-md-12">
+        <div class="card-body">
+            <h4>Participants:</h4>
+            <table class="participants" >
+                <thead>
                 <tr>
-                <td>{{ personmovie.person }}</td>
-                <td>{{ personmovie.category|default:'N/A'}}</td>
-                <td>{{ personmovie.job|default:'N/A'}}</td>
-                <td>{{ personmovie.characters|join:', '|default:'N/A' }}</td>
+                    <td><h6>Name</h6></td>
+                    <td><h6>Category</h6></td>
+                    <td><h6>Job</h6></td>
+                    <td><h6>Characters</h6></td>
                 </tr>
-            {% endfor %}
-            </tbody>
-        </table>
+                </thead>
+                <tbody>
+                {% for personmovie in object.personmovie_set.all %}
+                <tr>
+                    <td>{{ personmovie.person }}</td>
+                    <td>{{ personmovie.category|default:'N/A'}}</td>
+                    <td>{{ personmovie.job|default:'N/A'}}</td>
+                    <td>{{ personmovie.characters|join:', '|default:'N/A' }}</td>
+                </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
     <div class="col-md-3">
         <div class="card-body">
             <a href="{% url 'movies:movie_update' pk=movie.id%}" role="button" class="btn btn-dark">Update movie</a>

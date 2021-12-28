@@ -5,17 +5,15 @@
 {% endblock title %}
 
 {% block content %}
-    <h1>Users</h1>
-    <div class="row">
-        <div class="col-md-3">
-            <h3>Total: {{ users|length }} user(s)</h3>
-            <ul>
-            {% for user in users %}
-                <li>{{ user }} ({% if user.is_superuser %} admin {% else %} regular {% endif %}): {{ user.email }}</li>
-            {% endfor %}
-            </ul>
-            <br>
+    <div class="col-md-3">
+        <h4>Users</h4>
+            <h6>Total: {{ users|length }} user(s)</h6>
+            <h6>List of users:</h6>
+                <ol>
+                {% for user in users %}
+                    <li><b>{{ user }}</b> ({% if user.is_superuser %}admin{% else %}regular{% endif %}): {{ user.email }}</li>
+                {% endfor %}
+                </ol>
             <a href="javascript:history.back()" role="button" class="btn btn-dark">Back</a>
-        </div>
     </div>
 {% endblock content %}
